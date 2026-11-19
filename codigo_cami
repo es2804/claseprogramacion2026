@@ -1,0 +1,110 @@
+"""
+Genetic code as a slope graph (like plotnine's "A change in rank").
+Left: the 64 codons.  Right: the amino acids (+ Stop).
+
+Requirements:  pip install plotnine pandas
+"""
+import itertools
+import pandas as pd
+from plotnine import (
+    ggplot, aes, geom_segment, geom_point, geom_text, scale_color_manual,
+    scale_x_continuous, theme_void, theme, labs, element_text, guides,
+)
+
+# ---------------------------------------------------------------- data
+BASES = "UCAG"
+# Standard genetic code, codons ordered with 1st/2nd/3rd base in UCAG order
+AA_TABLE = ("FFLLSSSSYY**CC*W"
+            "LLLLPPPPHHQQRRRR"
+            "IIIMTTTTNNKKSSRR"
+            "VVVVAAAADDEEGGGG")
+codons = ["".join(c) for c in itertools.product(BASES, repeat=3)]
+code = dict(zip(codons, AA_TABLE))
+
+NAMES = {
+    "A": "Ala", "R": "Arg", "N": "Asn", "D": "Asp", "C": "Cys",
+    "Q": "Gln", "E": "Glu", "G": "Gly", "H": "His", "I": "Ile",
+    "L": "Leu", "K": "Lys", "M": "Met", "F": "Phe", "P": "Pro",
+    "S": "Ser", "T": "Thr", "W": "Trp", "Y": "Tyr", "V": "Val",
+    "*": "Stop",
+}
+CLASS = {}
+for a in "AVLIMFWPG":  CLASS[a] = "Nonpolar"
+for a in "STCYNQ":     CLASS[a] = "Polar"
+for a in "KRH":        CLASS[a] = "Positive"
+for a in "DE":         CLASS[a] = "Negative"
+CLASS["*"] = "Stop"
+
+COLORS = {
+    "Nonpolar": "#ff4f57",
+    "Polar":    "#5a64b1",
+    "Positive": "#FCA936",
+    "Negative": "#2a9a3bbc",
+    "Stop":     "#be4eff",
+}
+
+df = pd.DataFrame({"codon": codons, "aa": [code[c] for c in codons]})
+
+# Order amino acids by first appearance in the codon table, then group codons
+# Orden de los aminoácidos: 1) Met, 2) no polares, 3) polares,
+# 4) negativos, 5) positivos, 6) Stop
+# (dentro de cada grupo, alfabético por nombre de tres letras; puedes cambiarlo)
+AA_ORDER = [
+    "M",                                   # Metionina
+    "A", "G", "I", "L", "F", "P", "W", "V",  # No polares (Ala, Gly, Ile, Leu, Phe, Pro, Trp, Val)
+    "N", "C", "Q", "S", "T", "Y",            # Polares (Asn, Cys, Gln, Ser, Thr, Tyr)
+    "D", "E",                                # Negativos (Asp, Glu)
+    "R", "H", "K",                           # Positivos (Arg, His, Lys)
+    "*",                                     # Stop
+]
+
+df["aa_rank"] = df["aa"].map({a: i for i, a in enumerate(AA_ORDER)})
+
+# Codones agrupados según el orden anterior y, dentro de cada aminoácido, alfabéticos
+df = df.sort_values(["aa_rank", "codon"]).reset_index(drop=True)
+
+# Posición vertical (arriba = primero)
+n = len(df)
+df["y_left"] = n - df.index
+
+# Cada aminoácido queda a la altura promedio de sus codones
+df["y_right"] = df.groupby("aa")["y_left"].transform("mean")
+
+df["aa_label"] = df["aa"].map(lambda a: f"{NAMES[a]} ({a})" if a != "*" else "Stop")
+df["class"] = df["aa"].map(CLASS)
+
+# One row per amino acid for the right-hand labels
+right = df.drop_duplicates("aa")[["aa", "aa_label", "y_right", "class"]]
+
+# ---------------------------------------------------------------- plot
+X_LEFT, X_RIGHT = 0, 1
+
+p = (
+    ggplot()
+    + geom_segment(
+        df, aes(x=X_LEFT, xend=X_RIGHT, y="y_left", yend="y_right", color="class"),
+        size=0.8, alpha=0.8,
+    )
+    + geom_point(df, aes(x=X_LEFT, y="y_left", color="class"), size=2)
+    + geom_point(right, aes(x=X_RIGHT, y="y_right", color="class"), size=3)
+    + geom_text(df, aes(x=X_LEFT - 0.02, y="y_left", label="codon"),
+                ha="right", size=7, family="monospace")
+    + geom_text(right, aes(x=X_RIGHT + 0.02, y="y_right", label="aa_label"),
+                ha="left", size=9)
+    + scale_color_manual(values=COLORS, name="Amino acid type")
+    + scale_x_continuous(limits=(-0.25, 1.3))
+    + labs(title="The Standard Genetic Code",
+           subtitle="Codons (mRNA)  →  Amino acids")
+    + theme_void()
+    + theme(
+        figure_size=(7, 14),
+        plot_title=element_text(size=16, weight="bold", ha="center"),
+        plot_subtitle=element_text(size=11, ha="center"),
+        legend_position="bottom",
+    )
+)
+
+if __name__ == "__main__":
+    p.save("genetic_code_slope.png", dpi=200)
+    p.save("genetic_code_slope.pdf")
+    print("Saved genetic_code_slope.png / .pdf")
