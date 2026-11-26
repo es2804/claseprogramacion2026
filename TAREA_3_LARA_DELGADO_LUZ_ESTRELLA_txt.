@@ -1,0 +1,61 @@
+. Investigar cómo se usa el operador módulo (modulus) en python, explicarlo con sus palabras y poner un ejemplo. (1 punto)
+R= El operador modulo se representa con el simbolo " % ", y sirve para saber si un numero es par o impar. Tambien crea patrones repetitivos, limitar rangos y calcular ciclos de tiempo.
+Ejemplo:
+numero = 7
+if numero % 2 == 0:
+    print(f"El {numero} es par")
+else:
+    print(f"El {numero} es impar")  # <- Imprime esto, porque 7 % 2 sobra 1
+print("-" * 20)
+for i in range(1, 7):
+    grupo = i % 3
+    print(f"Elemento {i} asignado al grupo: {grupo}")
+
+2. Crear una lista vacía y llenarla con los números pares del 2 al 50 (2,4,6,8,...,48,50) utilizando un for y un condicional para controlar que sólo los pares se agreguen.  (2 puntos)
+R= 
+numeros_pares = [] 
+for numero in range(2, 51):
+    if numero % 2 == 0:
+        numeros_pares.append(numero)
+print(numeros_pares)
+
+3. Investigar para qué sirve el comando "break" en un for, explicarlo con sus palabras y hacer un ejemplo. (1 punto)
+R=El comando break sirve para detener y salir inmediatamente de un ciclo for (o while) sin importar cuántas vueltas o elementos le falten por recorrer.
+Ejemplos:
+pasajeros = ["Ana", "Carlos", "Luis", "Tu Nombre", "Sofía", "Diego", "Elena"] for persona in pasajeros: print(f"Revisando boleto de: {persona}...") if persona == "Tu Nombre": print("Encontrado Este es tu asiento. Puedes subir al avión.") break # Frena el ciclo de inmediato. Ya no revisa a Sofía, Diego ni Elena. print(" El proceso de abordaje continuó para los demás.")   
+
+4. Programar el método find de los strings a mano. (2 puntos) Sugerencia: utilizar break cuando encuentren lo que buscan
+palabra = 'banana'
+# regresar la posición de la primera 'a'
+R= 
+palabra = 'banana'
+letra_buscada = 'a'
+posicion = -1
+
+for indice, letra in enumerate(palabra):
+    if letra == letra_buscada:
+        posicion = indice
+        break
+
+print(posicion)
+
+
+5. Imprimir todos los números de la siguiente lista utilizando ciclos: (4 puntos)
+lista = [ [1], [1,2], [1,2,3], [1,2,3,4], [1,2,3,4,5] ]
+# 1
+# 1
+# 2
+# 1
+# 2
+# 3
+# 1
+# 2
+# 3
+# 4
+# 1
+# 2
+# 3
+# 4
+# 5
+R=
+lista = [, [1,2], [1,2,3], [1,2,3,4], [1,2,3,4,5] ] for sublista in lista: for numero in sublista: print(numero)
