@@ -1,0 +1,100 @@
+ Tarea 6
+
+# 1. Lista que funciona como conjunto
+
+def agregar_elemento(lista, elemento):
+    if elemento not in lista:
+        lista.append(elemento)
+
+
+# Funcion para agregar o modificar valores usando llaves
+def agregar_valor(llaves, valores, llave, valor):
+    if llave in llaves:
+        posicion = llaves.index(llave)
+        valores[posicion] = valor
+    else:
+        llaves.append(llave)
+        valores.append(valor)
+
+
+conjunto = [1, 2, 3, 4]
+
+agregar_elemento(conjunto, 5)
+agregar_elemento(conjunto, 3)
+
+print("Lista como conjunto:", conjunto)
+
+
+# 2. Dos listas que funcionan como diccionario
+
+llaves = ["uno", "dos", "tercero"]
+valores = [1, 2, 3]
+
+
+def buscar_valor(llaves, valores, llave):
+    if llave in llaves:
+        posicion = llaves.index(llave)
+        print(f"La llave {llave}, tiene valor {valores[posicion]}")
+    else:
+        print("La llave no existe")
+
+
+buscar_valor(llaves, valores, "uno")
+
+agregar_valor(llaves, valores, "dos", 20)
+agregar_valor(llaves, valores, "cuatro", 4)
+
+print("Llaves:", llaves)
+print("Valores:", valores)
+
+
+# 3. Convertir nucleotidos en proteina
+
+codigo_genetico = {
+    "TTT": "F", "TTC": "F", "TTA": "L", "TTG": "L",
+    "TCT": "S", "TCC": "S", "TCA": "S", "TCG": "S",
+    "TAT": "Y", "TAC": "Y", "TAA": "*", "TAG": "*",
+    "TGT": "C", "TGC": "C", "TGA": "*", "TGG": "W",
+
+    "CTT": "L", "CTC": "L", "CTA": "L", "CTG": "L",
+    "CCT": "P", "CCC": "P", "CCA": "P", "CCG": "P",
+    "CAT": "H", "CAC": "H", "CAA": "Q", "CAG": "Q",
+    "CGT": "R", "CGC": "R", "CGA": "R", "CGG": "R",
+
+    "ATT": "I", "ATC": "I", "ATA": "I", "ATG": "M",
+    "ACT": "T", "ACC": "T", "ACA": "T", "ACG": "T",
+    "AAT": "N", "AAC": "N", "AAA": "K", "AAG": "K",
+    "AGT": "S", "AGC": "S", "AGA": "R", "AGG": "R",
+
+    "GTT": "V", "GTC": "V", "GTA": "V", "GTG": "V",
+    "GCT": "A", "GCC": "A", "GCA": "A", "GCG": "A",
+    "GAT": "D", "GAC": "D", "GAA": "E", "GAG": "E",
+    "GGT": "G", "GGC": "G", "GGA": "G", "GGG": "G"
+}
+
+
+def traducir_proteina(secuencia):
+    secuencia = secuencia.upper()
+
+    if len(secuencia) % 3 != 0:
+        raise ValueError("La secuencia debe tener una longitud multiplo de 3")
+
+    proteina = ""
+
+    for i in range(0, len(secuencia), 3):
+        codon = secuencia[i:i+3]
+
+        if codon not in codigo_genetico:
+            raise ValueError("La secuencia contiene nucleotidos no validos")
+
+        proteina += codigo_genetico[codon]
+
+    return proteina
+
+
+secuencia = "ATGGCTTTTTAA"
+
+resultado = traducir_proteina(secuencia)
+
+print("Secuencia de nucleotidos:", secuencia)
+print("Proteina:", resultado)
